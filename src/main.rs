@@ -17,6 +17,7 @@ enum Commands {
     Done,
     Remove,
     New,
+    Help,
     Exit,
     Invalid,
 }
@@ -29,6 +30,7 @@ impl Commands {
             "d" => Commands::Done,
             "r" => Commands::Remove,
             "n" => Commands::New,
+            "h" => Commands::Help,
             "e" => Commands::Exit,
             _ => Commands::Invalid,
         }
@@ -51,6 +53,7 @@ fn main() {
         }
     };
 
+    get_help();
     loop {
         // get command input from user
         let input = get_user_input();
@@ -65,6 +68,7 @@ fn main() {
                 println!("Removed all the completed todos.")
             }
             Commands::New => start_new(&mut all_todos),
+            Commands::Help => get_help(),
             Commands::Exit => break,
             Commands::Invalid => println!("❌ Invalid input, try again."),
         }
@@ -96,6 +100,7 @@ fn add_todo(all_todos: &mut Vec<TodoItem>) {
     let todo_json = serde_json::to_string(&all_todos).expect("Couldn't convert to string");
     let _ = fs::write("todos.json", todo_json);
     println!("Todo Added.");
+    println!("Press 'l' to list all todos / Press 'h' for help with commands");
 }
 
 fn list_todos(all_todos: &Vec<TodoItem>) {
@@ -103,6 +108,7 @@ fn list_todos(all_todos: &Vec<TodoItem>) {
         let complete_mark = if todo.completed { "✅" } else { "❌" };
         println!("{}.  {}  ->  {}", todo.id, todo.todo, complete_mark);
     }
+    println!("Press 'd' to mark a todo complete / Press 'h' for help with commands");
 }
 
 fn mark_todo_done(all_todos: &mut Vec<TodoItem>) {
@@ -120,12 +126,13 @@ fn mark_todo_done(all_todos: &mut Vec<TodoItem>) {
                     serde_json::to_string(&all_todos).expect("Couldn't convert to string");
                 let _ = fs::write("todos.json", todo_json);
                 println!("{} is completed.", all_todos[value - 1].todo);
+                println!("Press 'l' to list all todos / Press 'h' for help with commands");
             } else {
-                println!("Wrong input! Enter the index of the todo you want to set completed.");
+                println!("Wrong input! You should enter the index of the todo you want to set completed.");
             }
         }
         Err(_) => {
-            println!("Wrong input! Enter the index of the todo you want to set completed.");
+            println!("Wrong input! You should enter the index of the todo you want to set completed.");
         }
     }
 }
@@ -135,4 +142,19 @@ fn start_new(all_todos: &mut Vec<TodoItem>) {
     let todo_json = serde_json::to_string(&all_todos).expect("Couldn't convert to string");
     let _ = fs::write("todos.json", todo_json);
     println!("Removed all the Todos, a new todo list!");
+    println!("Press 'a' to add a todo / Press 'h' for help with commands");
+}
+
+fn get_help() {
+    println!(
+        "
+    (a: Add a todo)
+    (l: List all todos)
+    (d: Mark a todo complete)
+    (r: Remove all completed todos)
+    (n: Start a new todo list)
+    (h: Get all the command info)
+    (e: Exit)
+    "
+    );
 }
