@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs;
 use std::io;
+use std::io::Write;
 use std::usize;
 
 #[derive(Deserialize, Serialize)]
@@ -65,7 +66,10 @@ fn main() {
             Commands::Done => mark_todo_done(&mut all_todos),
             Commands::Remove => {
                 all_todos.retain(|todo| !todo.completed);
-                println!("Removed all the completed todos.")
+                for (index, todo) in all_todos.iter_mut().enumerate() {
+                    todo.id = index + 1;
+                }
+                println!("Removed all the completed todos.");
             }
             Commands::New => start_new(&mut all_todos),
             Commands::Help => get_help(),
@@ -76,6 +80,8 @@ fn main() {
 }
 
 fn get_user_input() -> String {
+    print!("Type your command: ");
+    io::stdout().flush().unwrap();
     let mut user_input = String::new();
     io::stdin()
         .read_line(&mut user_input)
@@ -90,6 +96,10 @@ fn add_todo(all_todos: &mut Vec<TodoItem>) {
     io::stdin()
         .read_line(&mut add_todo)
         .expect("Couldn't read the input.");
+    if add_todo.trim().is_empty() {
+        println!("⚠️ Cannot add an empty todo!");
+        return;
+    };
     // add the todo to the json file
     let todo_struct: TodoItem = TodoItem {
         id: all_todos.len() + 1,
@@ -97,8 +107,7 @@ fn add_todo(all_todos: &mut Vec<TodoItem>) {
         completed: false,
     };
     all_todos.push(todo_struct);
-    let todo_json = serde_json::to_string(&all_todos).expect("Couldn't convert to string");
-    let _ = fs::write("todos.json", todo_json);
+    save_todos(&all_todos);
     println!("Todo Added.");
     println!("Press 'l' to list all todos / Press 'h' for help with commands");
 }
@@ -112,35 +121,39 @@ fn list_todos(all_todos: &Vec<TodoItem>) {
 }
 
 fn mark_todo_done(all_todos: &mut Vec<TodoItem>) {
+    // ask for the completed todo index
     let mut input = String::new();
     println!("Type the Todo index that you have completed:");
     io::stdin()
         .read_line(&mut input)
         .expect("Couldn't read the input!");
 
+    // find the todo and make completed: true
     match input.trim().parse::<usize>() {
         Ok(value) => {
             if value > 0 && all_todos.len() >= value {
                 all_todos[value - 1].completed = true;
-                let todo_json =
-                    serde_json::to_string(&all_todos).expect("Couldn't convert to string");
-                let _ = fs::write("todos.json", todo_json);
+                save_todos(&all_todos);
                 println!("{} is completed.", all_todos[value - 1].todo);
                 println!("Press 'l' to list all todos / Press 'h' for help with commands");
             } else {
-                println!("Wrong input! You should enter the index of the todo you want to set completed.");
+                println!(
+                    "Wrong input! You should enter the index of the todo you want to set completed."
+                );
             }
         }
         Err(_) => {
-            println!("Wrong input! You should enter the index of the todo you want to set completed.");
+            println!(
+                "Wrong input! You should enter the index of the todo you want to set completed."
+            );
         }
     }
 }
 
 fn start_new(all_todos: &mut Vec<TodoItem>) {
+    // empty the all_todos ver and push it to the json file
     all_todos.clear();
-    let todo_json = serde_json::to_string(&all_todos).expect("Couldn't convert to string");
-    let _ = fs::write("todos.json", todo_json);
+    save_todos(&all_todos);
     println!("Removed all the Todos, a new todo list!");
     println!("Press 'a' to add a todo / Press 'h' for help with commands");
 }
@@ -157,4 +170,9 @@ fn get_help() {
     (e: Exit)
     "
     );
+}
+
+fn save_todos(all_todos: &Vec<TodoItem>) {
+    let todo_json = serde_json::to_string(all_todos).expect("Couldn't convert to string");
+    let _ = fs::write("todos.json", todo_json);
 }
