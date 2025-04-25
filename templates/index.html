@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <ul>
+        {% for todo in todos %}
+            <li>{{ todo.id }}. {{ todo.todo }} {% if todo.completed %} (completed) {% endif %}</li>
+        {% else %}
+            <li>No todos yet.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Add a New Todo</h2>
+    <form action="/add" method="POST">
+        <input type="text" name="todo" placeholder="Enter your todo">
+        <button type="submit">Add Todo</button>
+    </form>
+
+    <h2>Actions</h2>
+    <ul>
+        <li><a href="/delete">Delete Completed Todos</a></li>
+    </ul>
+</body>
+</html>
