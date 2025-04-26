@@ -24,7 +24,7 @@ async fn main() {
         TodoItem {
             id: 2,
             todo: "Build a web app".to_string(),
-            completed: false,
+            completed: true,
         },
     ];
 

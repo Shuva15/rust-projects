@@ -9,7 +9,16 @@
     <h1>Todo List</h1>
     <ul>
         {% for todo in todos %}
-            <li>{{ todo.id }}. {{ todo.todo }} {% if todo.completed %} (completed) {% endif %}</li>
+            <li>
+                {{ todo.id }}. {{ todo.todo }}
+                {% if todo.completed %}
+                 ✅ 
+                {% else if !todo.completed %}
+                 ❌ 
+                <form action="/complete/{{ todo.id }}" method="POST" style="display:inline;">
+                    <button type="submit">Mark Done</button>
+                </form>
+                {% endif %}</li>
         {% else %}
             <li>No todos yet.</li>
         {% endfor %}
@@ -23,7 +32,9 @@
 
     <h2>Actions</h2>
     <ul>
-        <li><a href="/delete">Delete Completed Todos</a></li>
+        <form action="/delete" method="POST">
+            <button type="submit">Delete Completed Todos</button>
+        </li>
     </ul>
 </body>
 </html>
