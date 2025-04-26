@@ -5,31 +5,30 @@ mod state;
 use axum::{routing::{get, post}, Router};
 
 use handlers::{show_todos, add_todo_handler, complete_todo_handler, delete_completed_todos_handler};
-use models::TodoItem;
 use state::AppState;
-use std::{
-    net::SocketAddr,
-    sync::{Arc, Mutex},
-};
+use std::net::SocketAddr;
+use dotenvy::dotenv;
+use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
-    // Starting with some dummy todos
-    let initial_todos = vec![
-        TodoItem {
-            id: 1,
-            todo: "Learn Rust".to_string(),
-            completed: false,
-        },
-        TodoItem {
-            id: 2,
-            todo: "Build a web app".to_string(),
-            completed: true,
-        },
-    ];
+    dotenv().ok();
+    let pool = SqlitePool::connect("sqlite:todos.db").await.expect("Failed to connect to database");
+
+    // 🌟 2. (Optional) Initialize the table if it doesn't exist
+    sqlx::query!(
+        "CREATE TABLE IF NOT EXISTS todos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            todo TEXT NOT NULL,
+            completed BOOLEAN NOT NULL
+        )"
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to initialize database");
 
     let app_state = AppState {
-        todos: Arc::new(Mutex::new(initial_todos)),
+        db: pool
     };
 
     let app = Router::new()

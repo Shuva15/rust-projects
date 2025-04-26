@@ -1,8 +1,6 @@
-use std::sync::{Arc, Mutex};
-
-use crate::models::TodoItem;
+use sqlx::SqlitePool;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub todos: Arc<Mutex<Vec<TodoItem>>>,
+    pub db: SqlitePool,
 }

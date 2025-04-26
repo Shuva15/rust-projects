@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
 use askama::Template;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct TodoItem {
-    pub id: usize,
+#[derive(Debug, sqlx::FromRow)]
+pub struct TodoFromDb {
+    pub id: i64,
     pub todo: String,
     pub completed: bool,
 }
@@ -11,6 +10,6 @@ pub struct TodoItem {
 #[derive(Template)]
 #[template(path = "index.html")]
 pub struct TodoListTemplate<'a> {
-    pub todos: &'a Vec<TodoItem>,
+    pub todos: &'a Vec<TodoFromDb>,
 }
 
