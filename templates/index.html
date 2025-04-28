@@ -4,37 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        li {
+            background: #ffffff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        form {
+            display: inline;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #468585;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #50B498;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-form {
+            display: flex;
+            justify-content: center;
+            text-align:center;
+            margin-top:10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Todo List</h1>
+
     <ul>
-        {% for todo in todos %}
+        {% for (i, todo) in todos.iter().enumerate() %}
             <li>
-                {{ todo.id }}. {{ todo.todo }}
-                {% if todo.completed %}
-                 ✅ 
-                {% else if !todo.completed %}
-                 ❌ 
-                <form action="/complete/{{ todo.id }}" method="POST" style="display:inline;">
-                    <button type="submit">Mark Done</button>
-                </form>
-                {% endif %}</li>
+                <span>{{ i + 1 }}. {{ todo.todo }}</span>
+                <div class="todo-actions">
+                    {% if todo.completed %}
+                        ✅
+                    {% else %}
+                        ❌ 
+                        <form action="/complete/{{ todo.id }}" method="POST">
+                            <button type="submit">Mark Done</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </li>
         {% else %}
-            <li>No todos yet.</li>
+            <li style="text-align:center;">No todos yet.</li>
         {% endfor %}
     </ul>
 
     <h2>Add a New Todo</h2>
-    <form action="/add" method="POST">
+    <form action="/add" method="POST" style="text-align:center;">
         <input type="text" name="todo" placeholder="Enter your todo">
         <button type="submit">Add Todo</button>
     </form>
 
     <h2>Actions</h2>
-    <ul>
-        <form action="/delete" method="POST">
-            <button type="submit">Delete Completed Todos</button>
-        </li>
-    </ul>
+    <form action="/delete" method="POST" class="delete-form">
+        <button type="submit">Delete Completed Todos</button>
+    </form>
 </body>
 </html>
+

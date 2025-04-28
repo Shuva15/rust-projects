@@ -15,7 +15,7 @@ async fn main() {
     dotenv().ok();
     let pool = SqlitePool::connect("sqlite:todos.db").await.expect("Failed to connect to database");
 
-    // 🌟 2. (Optional) Initialize the table if it doesn't exist
+    // Initialize the table if it doesn't exist
     sqlx::query!(
         "CREATE TABLE IF NOT EXISTS todos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
