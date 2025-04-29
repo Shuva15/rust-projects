@@ -7,7 +7,7 @@ use std::io::{self, Write};
 use vault::{EncryptedVault, Vault};
 
 fn main() {
-    let master_password = prompt("🔐 Enter your master password");
+    let master_password = rpassword::prompt_password("Enter your master password: ").unwrap();
 
     let ciphervault: EncryptedVault;
     let mut vault_entries = Vault::new();
@@ -34,7 +34,7 @@ fn main() {
     println!("🔐 Welcome to your password vault!");
 
     loop {
-        println!("Commands: add | get | list | remove | help | exit");
+        println!("Commands: add | get | list | remove | cmp | help | exit");
         print!("> ");
         io::stdout().flush().unwrap();
 
@@ -80,12 +80,17 @@ fn main() {
                     None => println!("❌ No entry found for that site."),
                 }
             }
+            "cmp" => {
+                change_master_password(&master_password, &vault_entries);
+                break;
+            }
             "help" => {
                 println!("Commands you can use:");
                 println!("- add    → Add a new site with username & password");
                 println!("- get    → Retrieve username & password for a site");
                 println!("- list   → List all saved site names");
                 println!("- remove → Remove a site’s entry");
+                println!("- cmp    → Change Master Password");
                 println!("- help   → Show this help message");
                 println!("- exit   → Exit the password vault");
             }
@@ -106,4 +111,21 @@ fn prompt(label: &str) -> String {
         };
         println!("Input can't be empty! Enter a valid {}:", label);
     }
+}
+
+fn change_master_password(master_password: &String, vault_entries: &Vault) {
+    let old_password = rpassword::prompt_password("Enter your master password: ").unwrap();
+    if master_password != &old_password {
+        println!("You have given wrong password! To change master password try again later with correct password.");
+        return;
+    }
+    let new_password = prompt("Set new master password");
+    let confirm_password = rpassword::prompt_password("Type the new password again: ").unwrap();
+    if new_password != confirm_password {
+        println!("Your new password doesn't match! Exiting Vault try again later.");
+        return;
+    }
+    vault_entries.save_to_file(&new_password);
+    println!("Your master password is changed successfully! Enter with your new password to access Vault.");
+    return;
 }
