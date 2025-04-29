@@ -6,3 +6,7 @@ A simple Todo List web app built with **Rust**, **Axum**, **SQLx**, and **Askama
 
 - Add, mark as done, and delete todos
 - SQLite database for persistent storage
+
+## Setup
+
+- Create a .env file in the root project and add this **DATABASE_URL=sqlite:todos.db** veriable in the file

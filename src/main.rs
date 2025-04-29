@@ -6,14 +6,15 @@ use axum::{routing::{get, post}, Router};
 
 use handlers::{show_todos, add_todo_handler, complete_todo_handler, delete_completed_todos_handler};
 use state::AppState;
-use std::net::SocketAddr;
+use std::{ net::SocketAddr, env };
 use dotenvy::dotenv;
 use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let pool = SqlitePool::connect("sqlite:todos.db").await.expect("Failed to connect to database");
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let pool = SqlitePool::connect(&db_url).await.expect("Failed to connect to database");
 
     // Initialize the table if it doesn't exist
     sqlx::query!(
